@@ -1,19 +1,35 @@
 import { generateCodeVerifierAndChallenge } from "./pkce.js";
 
-const AUTHORIZE_URL = `https://${import.meta.env.VITE_OAUTH_DOMAIN}/authorize`;
-const CLIENT_ID = import.meta.env.VITE_OAUTH_CLIENT_ID;
+export const authorize = async (provider) => {
+  const { authUrl, clientId } = _getConfig(provider);
+  const { codeVerifier, codeChallenge } =
+    await generateCodeVerifierAndChallenge();
+  localStorage.setItem("code_verifier", codeVerifier);
 
-export const setupLoginButton = (button) => {
-  button.addEventListener("click", async () => {
-    const { codeVerifier, codeChallenge } =
-      await generateCodeVerifierAndChallenge();
-    localStorage.setItem("code_verifier", codeVerifier);
-
-    const redirectUri = window.location.origin;
-    const scope = "openid profile email";
-
-    const url = `${AUTHORIZE_URL}?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
-
-    window.location.href = url;
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: clientId,
+    redirect_uri: window.location.origin,
+    scope: "openid profile email",
+    code_challenge: codeChallenge,
+    code_challenge_method: "S256",
+    state: provider,
   });
+
+  window.location.href = `${authUrl}?${params.toString()}`;
 };
+
+function _getConfig(provider) {
+  let authUrl;
+  let clientId;
+  
+  if (provider === "google") {
+    authUrl = import.meta.env.VITE_OAUTH_GOOGLE_AUTH_ENDPOINT;
+    clientId = import.meta.env.VITE_OAUTH_GOOGLE_CLIENT_ID;
+  } else if (provider === "auth0") {
+    authUrl = import.meta.env.VITE_OAUTH_AUTH0_AUTH_ENDPOINT;
+    clientId = import.meta.env.VITE_OAUTH_AUTH0_CLIENT_ID;
+  }
+
+  return { authUrl, clientId };
+}
