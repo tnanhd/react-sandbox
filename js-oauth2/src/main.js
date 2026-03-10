@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const userInfo = await getUserInfo(provider);
     app.innerHTML = `
         <h1>User Info</h1>
+        ${userInfo.picture ? `<img src="${userInfo.picture}" alt="User Picture" width="100" />` : ''}
         <pre>${JSON.stringify(userInfo, null, 2)}</pre>
         <button id="logout">Logout</button>
       `;
