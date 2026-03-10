@@ -10,6 +10,8 @@ export const getUserInfo = async (provider) => {
     userInfoEndpoint = import.meta.env.VITE_OAUTH_GOOGLE_USERINFO_ENDPOINT;
   } else if (provider === "auth0") {
     userInfoEndpoint = import.meta.env.VITE_OAUTH_AUTH0_USERINFO_ENDPOINT;
+  } else if (provider === "facebook") {
+    userInfoEndpoint = import.meta.env.VITE_OAUTH_FACEBOOK_USERINFO_ENDPOINT;
   } else {
     console.error("Unsupported provider");
     return;

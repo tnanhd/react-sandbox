@@ -2,19 +2,36 @@ export const getAccessToken = async (code, provider) => {
   try {
     const { authUrl, clientId } = getConfig(provider);
 
-    const response = await fetch(authUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        grant_type: "authorization_code",
-        code_verifier: localStorage.getItem("code_verifier"),
+    const redirectUri = window.location.origin;
+    let response;
+    if (provider === "facebook") {
+      const params = new URLSearchParams({
         client_id: clientId,
+        redirect_uri: redirectUri + "/",
         code: code,
-        redirect_uri: window.location.origin,
-      }),
-    });
+        code_verifier: localStorage.getItem("code_verifier"),
+      });
+      response = await fetch(`${authUrl}?${params.toString()}`, {
+        method: "GET",
+      });
+
+      return await response.json();
+    } else {
+      response = await fetch(authUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          grant_type: "authorization_code",
+          code_verifier: localStorage.getItem("code_verifier"),
+          client_id: clientId,
+          code: code,
+          redirect_uri: redirectUri,
+        }),
+      });
+    }
+
     return await response.json();
   } catch (error) {
     console.error("Error fetching access token:", error);
@@ -32,6 +49,11 @@ function getConfig(provider) {
   } else if (provider === "auth0") {
     tokenUrl = import.meta.env.VITE_OAUTH_AUTH0_TOKEN_ENDPOINT;
     clientId = import.meta.env.VITE_OAUTH_AUTH0_CLIENT_ID;
+  } else if (provider === "facebook") {
+    tokenUrl = import.meta.env.VITE_OAUTH_FACEBOOK_TOKEN_ENDPOINT;
+    clientId = import.meta.env.VITE_OAUTH_FACEBOOK_CLIENT_ID;
+  } else {
+    throw new Error("Unsupported provider");
   }
 
   return { authUrl: tokenUrl, clientId };

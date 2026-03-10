@@ -4,19 +4,27 @@ export const authorize = async (provider) => {
   const { authUrl, clientId } = _getConfig(provider);
   const { codeVerifier, codeChallenge } =
     await generateCodeVerifierAndChallenge();
+  const redirectUri = window.location.origin;
   localStorage.setItem("code_verifier", codeVerifier);
 
   const params = new URLSearchParams({
     response_type: "code",
     client_id: clientId,
-    redirect_uri: window.location.origin,
-    scope: "openid profile email",
+    redirect_uri: redirectUri,
     code_challenge: codeChallenge,
     code_challenge_method: "S256",
     state: provider,
   });
 
-  window.location.href = `${authUrl}?${params.toString()}`;
+  if (provider === "google" || provider === "auth0") {
+    params.append("scope", "openid profile email");
+  } else if (provider === "facebook") {
+    params.append("scope", "openid");
+  }
+
+  const authEndpoint = `${authUrl}?${params.toString()}`;
+  console.log("Redirecting to auth endpoint:", authEndpoint);
+  window.location.href = authEndpoint;
 };
 
 function _getConfig(provider) {
@@ -29,6 +37,11 @@ function _getConfig(provider) {
   } else if (provider === "auth0") {
     authUrl = import.meta.env.VITE_OAUTH_AUTH0_AUTH_ENDPOINT;
     clientId = import.meta.env.VITE_OAUTH_AUTH0_CLIENT_ID;
+  } else if (provider === "facebook") {
+    authUrl = import.meta.env.VITE_OAUTH_FACEBOOK_AUTH_ENDPOINT;
+    clientId = import.meta.env.VITE_OAUTH_FACEBOOK_CLIENT_ID;
+  } else {
+    throw new Error("Unsupported provider");
   }
 
   return { authUrl, clientId };
