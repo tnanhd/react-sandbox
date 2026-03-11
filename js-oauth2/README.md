@@ -14,7 +14,13 @@ A vanilla JavaScript app demonstrating OAuth2 + PKCE with Auth0, Google, and Fac
    - **Allowed Logout URLs**
    - **Allowed Web Origins**
 5. Save changes
-6. Copy the **Client ID** from the app settings page
+6. Copy the **Domain** (e.g. `dev-xxxx.us.auth0.com`) and **Client ID** from the app settings page
+
+> All Auth0 endpoints are derived from the domain:
+> - Authorization: `https://<domain>/oauth/authorize`
+> - Token: `https://<domain>/oauth/token`
+> - Logout: `https://<domain>/v2/logout`
+> - User Info: `https://<domain>/userinfo`
 
 ### 2. Create a Google OAuth2 Application
 
@@ -42,6 +48,7 @@ A vanilla JavaScript app demonstrating OAuth2 + PKCE with Auth0, Google, and Fac
 Create a `.env.local` file in the project root (gitignored, safe for secrets):
 
 ```
+VITE_OAUTH_AUTH0_DOMAIN=your-tenant.us.auth0.com
 VITE_OAUTH_AUTH0_CLIENT_ID=your_auth0_client_id
 
 VITE_OAUTH_GOOGLE_CLIENT_ID=your_google_client_id
@@ -49,7 +56,7 @@ VITE_OAUTH_GOOGLE_CLIENT_ID=your_google_client_id
 VITE_OAUTH_FACEBOOK_CLIENT_ID=your_facebook_app_id
 ```
 
-The API endpoints are already configured in `.env`. Only the client IDs need to go in `.env.local`.
+Auth0 API endpoints are constructed from `VITE_OAUTH_AUTH0_DOMAIN` at runtime. Google and Facebook endpoints are already configured in `.env`.
 
 ### 5. Install and Run
 

@@ -15,7 +15,7 @@ export const logout = (provider) => {
   }
 
   if (provider === "auth0") {
-    window.location.href = `${import.meta.env.VITE_OAUTH_AUTH0_LOGOUT_ENDPOINT}?client_id=${import.meta.env.VITE_OAUTH_AUTH0_CLIENT_ID}&returnTo=${encodeURIComponent(window.location.origin)}`;
+    window.location.href = `https://${import.meta.env.VITE_OAUTH_AUTH0_DOMAIN}/v2/logout?client_id=${import.meta.env.VITE_OAUTH_AUTH0_CLIENT_ID}&returnTo=${encodeURIComponent(window.location.origin)}`;
   }
   
   if (provider === "facebook") {

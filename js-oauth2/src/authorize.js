@@ -35,7 +35,7 @@ function _getConfig(provider) {
     authUrl = import.meta.env.VITE_OAUTH_GOOGLE_AUTH_ENDPOINT;
     clientId = import.meta.env.VITE_OAUTH_GOOGLE_CLIENT_ID;
   } else if (provider === "auth0") {
-    authUrl = import.meta.env.VITE_OAUTH_AUTH0_AUTH_ENDPOINT;
+    authUrl = `https://${import.meta.env.VITE_OAUTH_AUTH0_DOMAIN}/oauth/authorize`;
     clientId = import.meta.env.VITE_OAUTH_AUTH0_CLIENT_ID;
   } else if (provider === "facebook") {
     authUrl = import.meta.env.VITE_OAUTH_FACEBOOK_AUTH_ENDPOINT;
