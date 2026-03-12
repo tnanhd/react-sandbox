@@ -1,6 +1,6 @@
 # js-oauth2
 
-A vanilla JavaScript app demonstrating OAuth2 + PKCE with Auth0, Google, and Facebook, bundled with Vite.
+A vanilla JavaScript app demonstrating OAuth2 + PKCE with Auth0, Google, Facebook, and Asgardeo, bundled with Vite.
 
 ## Setup
 
@@ -43,7 +43,25 @@ A vanilla JavaScript app demonstrating OAuth2 + PKCE with Auth0, Google, and Fac
 6. Go to **Facebook Login > Settings**
 7. Copy the **App ID** from **Settings > Basic**
 
-### 4. Configure Environment Variables
+### 4. Create an Asgardeo Application
+
+1. Log in to [Asgardeo Console](https://console.asgardeo.io/)
+2. Go to **Applications** and click **New Application**
+3. Choose **Single Page Application** and click **Create**
+4. In your app settings, add `http://localhost:5173` to:
+   - **Authorized redirect URLs**
+   - **Allowed origins**
+5. Save changes
+6. Copy the **Client ID** from the app's **Protocol** tab
+7. Copy your **Organization name** (shown in the URL as `https://api.asgardeo.io/t/<organization-name>/`)
+
+> All Asgardeo endpoints are derived from the organization name:
+> - Authorization: `https://api.asgardeo.io/t/<org>/oauth2/authorize`
+> - Token: `https://api.asgardeo.io/t/<org>/oauth2/token`
+> - Logout: `https://api.asgardeo.io/t/<org>/oidc/logout`
+> - User Info: `https://api.asgardeo.io/t/<org>/oauth2/userinfo`
+
+### 5. Configure Environment Variables
 
 Create a `.env.local` file in the project root (gitignored, safe for secrets):
 
@@ -54,11 +72,14 @@ VITE_OAUTH_AUTH0_CLIENT_ID=your_auth0_client_id
 VITE_OAUTH_GOOGLE_CLIENT_ID=your_google_client_id
 
 VITE_OAUTH_FACEBOOK_CLIENT_ID=your_facebook_app_id
+
+VITE_OAUTH_ASGARDEO_PROJECT_ID=your-organization-name
+VITE_OAUTH_ASGARDEO_CLIENT_ID=your_asgardeo_client_id
 ```
 
-Auth0 API endpoints are constructed from `VITE_OAUTH_AUTH0_DOMAIN` at runtime. Google and Facebook endpoints are already configured in `.env`.
+Auth0 and Asgardeo API endpoints are constructed from their respective domain/org variables at runtime. Google and Facebook endpoints are already configured in `.env`.
 
-### 5. Install and Run
+### 6. Install and Run
 
 ```bash
 npm install
@@ -82,6 +103,7 @@ The app detects `code=` in the URL, reads the provider from the `state` paramete
 | Auth0 | POST | `application/json` |
 | Google | POST | `application/json` |
 | Facebook | GET | query parameters |
+| Asgardeo | POST | `application/x-www-form-urlencoded` |
 
 ### Step 3: Logout
 
@@ -90,3 +112,4 @@ The app detects `code=` in the URL, reads the provider from the `state` paramete
 | Auth0 | Redirect to `/v2/logout` with `returnTo` |
 | Google | POST to `/revoke` token endpoint, then redirect home |
 | Facebook | Redirect home (no server-side revocation endpoint) |
+| Asgardeo | Redirect to `/oidc/logout` with `post_logout_redirect_uri` |

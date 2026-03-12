@@ -12,9 +12,10 @@ export const getUserInfo = async (provider) => {
     userInfoEndpoint = `https://${import.meta.env.VITE_OAUTH_AUTH0_DOMAIN}/userinfo`;
   } else if (provider === "facebook") {
     userInfoEndpoint = import.meta.env.VITE_OAUTH_FACEBOOK_USERINFO_ENDPOINT;
+  } else if (provider === "asgardeo") {
+    userInfoEndpoint = `https://api.asgardeo.io/t/${import.meta.env.VITE_OAUTH_ASGARDEO_PROJECT_ID}/oauth2/userinfo`;
   } else {
-    console.error("Unsupported provider");
-    return;
+    throw new Error("Unsupported provider");
   }
 
   const response = await fetch(userInfoEndpoint, {

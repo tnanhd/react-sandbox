@@ -21,4 +21,8 @@ export const logout = (provider) => {
   if (provider === "facebook") {
     window.location.href = redirectUri;
   }
+
+  if (provider === "asgardeo") {
+    window.location.href = `https://api.asgardeo.io/t/${import.meta.env.VITE_OAUTH_ASGARDEO_PROJECT_ID}/oidc/logout?client_id=${import.meta.env.VITE_OAUTH_ASGARDEO_CLIENT_ID}&post_logout_redirect_uri=${encodeURIComponent(window.location.origin)}`;
+  }
 };

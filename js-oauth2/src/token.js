@@ -1,6 +1,6 @@
 export const getAccessToken = async (code, provider) => {
   try {
-    const { authUrl, clientId } = getConfig(provider);
+    const { tokenUrl, clientId } = getConfig(provider);
 
     const redirectUri = window.location.origin;
     let response;
@@ -16,8 +16,22 @@ export const getAccessToken = async (code, provider) => {
       });
 
       return await response.json();
+    } else if (provider === "asgardeo") {
+      response = await fetch(tokenUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          grant_type: "authorization_code",
+          code_verifier: localStorage.getItem("code_verifier"),
+          client_id: clientId,
+          code: code,
+          redirect_uri: redirectUri,
+        }),
+      });
     } else {
-      response = await fetch(authUrl, {
+      response = await fetch(tokenUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,9 +66,12 @@ function getConfig(provider) {
   } else if (provider === "facebook") {
     tokenUrl = import.meta.env.VITE_OAUTH_FACEBOOK_TOKEN_ENDPOINT;
     clientId = import.meta.env.VITE_OAUTH_FACEBOOK_CLIENT_ID;
+  } else if (provider === "asgardeo") {
+    tokenUrl = `https://api.asgardeo.io/t/${import.meta.env.VITE_OAUTH_ASGARDEO_PROJECT_ID}/oauth2/token`;
+    clientId = import.meta.env.VITE_OAUTH_ASGARDEO_CLIENT_ID;
   } else {
     throw new Error("Unsupported provider");
   }
 
-  return { authUrl: tokenUrl, clientId };
+  return { tokenUrl, clientId };
 }

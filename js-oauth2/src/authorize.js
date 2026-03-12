@@ -16,7 +16,7 @@ export const authorize = async (provider) => {
     state: provider,
   });
 
-  if (provider === "google" || provider === "auth0") {
+  if (provider === "google" || provider === "auth0" || provider === "asgardeo") {
     params.append("scope", "openid profile email");
   } else if (provider === "facebook") {
     params.append("scope", "openid");
@@ -40,6 +40,9 @@ function _getConfig(provider) {
   } else if (provider === "facebook") {
     authUrl = import.meta.env.VITE_OAUTH_FACEBOOK_AUTH_ENDPOINT;
     clientId = import.meta.env.VITE_OAUTH_FACEBOOK_CLIENT_ID;
+  } else if (provider === "asgardeo") {
+    authUrl = `https://api.asgardeo.io/t/${import.meta.env.VITE_OAUTH_ASGARDEO_PROJECT_ID}/oauth2/authorize`;
+    clientId = import.meta.env.VITE_OAUTH_ASGARDEO_CLIENT_ID;
   } else {
     throw new Error("Unsupported provider");
   }

@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       <button id="login-auth0">Login Auth0</button>
       <button id="login-google">Login Google</button>
       <button id="login-facebook">Login Facebook</button>
+      <button id="login-asgardeo">Login Asgardeo</button>
     `;
     document
       .querySelector("#login-auth0")
@@ -22,6 +23,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document
       .querySelector("#login-facebook")
       .addEventListener("click", () => authorize("facebook"));
+    document
+      .querySelector("#login-asgardeo")
+      .addEventListener("click", () => authorize("asgardeo"));
     return;
   }
 
