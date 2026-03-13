@@ -2,12 +2,14 @@ export const getAccessToken = async (code, provider) => {
   try {
     const { tokenUrl, clientId } = getConfig(provider);
 
-    const redirectUri = window.location.origin;
+    const redirectUri = provider === "facebook"
+        ? window.location.origin + "/"
+        : window.location.origin;
     let response;
     if (provider === "facebook") {
       const params = new URLSearchParams({
         client_id: clientId,
-        redirect_uri: redirectUri + "/",
+        redirect_uri: redirectUri,
         code: code,
         code_verifier: localStorage.getItem("code_verifier"),
       });
@@ -16,7 +18,7 @@ export const getAccessToken = async (code, provider) => {
       });
 
       return await response.json();
-    } else if (provider === "asgardeo") {
+    } else if (provider === "asgardeo" || provider === "clerk") {
       response = await fetch(tokenUrl, {
         method: "POST",
         headers: {
@@ -69,6 +71,9 @@ function getConfig(provider) {
   } else if (provider === "asgardeo") {
     tokenUrl = `https://api.asgardeo.io/t/${import.meta.env.VITE_OAUTH_ASGARDEO_PROJECT_ID}/oauth2/token`;
     clientId = import.meta.env.VITE_OAUTH_ASGARDEO_CLIENT_ID;
+  } else if (provider === "clerk") {
+    tokenUrl = `https://${import.meta.env.VITE_OAUTH_CLERK_DOMAIN}/oauth/token`;
+    clientId = import.meta.env.VITE_OAUTH_CLERK_CLIENT_ID;
   } else {
     throw new Error("Unsupported provider");
   }

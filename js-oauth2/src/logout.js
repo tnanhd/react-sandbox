@@ -25,4 +25,17 @@ export const logout = (provider) => {
   if (provider === "asgardeo") {
     window.location.href = `https://api.asgardeo.io/t/${import.meta.env.VITE_OAUTH_ASGARDEO_PROJECT_ID}/oidc/logout?client_id=${import.meta.env.VITE_OAUTH_ASGARDEO_CLIENT_ID}&post_logout_redirect_uri=${encodeURIComponent(window.location.origin)}`;
   }
+
+  if (provider === "clerk") {
+    fetch(`https://${import.meta.env.VITE_OAUTH_CLERK_DOMAIN}/oauth/revoke`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id: import.meta.env.VITE_OAUTH_CLERK_CLIENT_ID,
+        token: accessToken,
+      }),
+    }).finally(() => {
+      window.location.href = redirectUri;
+    });
+  }
 };

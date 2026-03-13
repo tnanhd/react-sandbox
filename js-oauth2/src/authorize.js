@@ -16,10 +16,10 @@ export const authorize = async (provider) => {
     state: provider,
   });
 
-  if (provider === "google" || provider === "auth0" || provider === "asgardeo") {
-    params.append("scope", "openid profile email");
-  } else if (provider === "facebook") {
+  if (provider === "facebook") {
     params.append("scope", "openid");
+  } else {
+    params.append("scope", "openid profile email");
   }
 
   const authEndpoint = `${authUrl}?${params.toString()}`;
@@ -43,8 +43,11 @@ function _getConfig(provider) {
   } else if (provider === "asgardeo") {
     authUrl = `https://api.asgardeo.io/t/${import.meta.env.VITE_OAUTH_ASGARDEO_PROJECT_ID}/oauth2/authorize`;
     clientId = import.meta.env.VITE_OAUTH_ASGARDEO_CLIENT_ID;
+  } else if (provider === "clerk") {
+    authUrl = `https://${import.meta.env.VITE_OAUTH_CLERK_DOMAIN}/oauth/authorize`;
+    clientId = import.meta.env.VITE_OAUTH_CLERK_CLIENT_ID;
   } else {
-    throw new Error("Unsupported provider");
+    throw new Error(`Unsupported provider: ${provider}`);
   }
 
   return { authUrl, clientId };
