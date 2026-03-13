@@ -1,6 +1,6 @@
 # js-oauth2
 
-A vanilla JavaScript app demonstrating OAuth2 + PKCE with Auth0, Google, Facebook, and Asgardeo, bundled with Vite.
+A vanilla JavaScript app demonstrating OAuth2 + PKCE with Auth0, Google, Facebook, Asgardeo, Clerk, and WorkOS, bundled with Vite.
 
 ## Setup
 
@@ -61,7 +61,32 @@ A vanilla JavaScript app demonstrating OAuth2 + PKCE with Auth0, Google, Faceboo
 > - Logout: `https://api.asgardeo.io/t/<org>/oidc/logout`
 > - User Info: `https://api.asgardeo.io/t/<org>/oauth2/userinfo`
 
-### 5. Configure Environment Variables
+### 5. Create a Clerk Application
+
+1. Sign in to the [Clerk Dashboard](https://clerk.com/)
+2. Create a new application (or select an existing one)
+3. Add `http://localhost:5173` as an **OAuth Redirect URL**
+4. Copy the **Domain** (e.g. `your-org.clerk.dev`) and **Client ID**
+
+> Clerk endpoints are derived from the domain:
+> - Authorization: `https://<domain>/oauth/authorize`
+> - Token: `https://<domain>/oauth/token`
+> - User Info: `https://<domain>/oauth/userinfo`
+
+### 6. Create a WorkOS Application
+
+1. Log in to [WorkOS Dashboard](https://dashboard.workos.com/)
+2. Go to **OAuth** and click **Create Application**
+3. Set **Redirect URI** to `http://localhost:5173`
+4. Copy the **Domain** (typically `api.workos.com`) and **Client ID**
+5. Go to Session and configure Cross-Origin Resource Sharing (CORS)
+
+> WorkOS endpoints are derived from the domain:
+> - Authorization: `https://<domain>/oauth2/authorize`
+> - Token: `https://<domain>/oauth2/token`
+> - User Info: `https://<domain>/oauth2/userinfo`
+
+### 7. Configure Environment Variables
 
 Create a `.env.local` file in the project root (gitignored, safe for secrets):
 
@@ -75,11 +100,17 @@ VITE_OAUTH_FACEBOOK_CLIENT_ID=your_facebook_app_id
 
 VITE_OAUTH_ASGARDEO_PROJECT_ID=your-organization-name
 VITE_OAUTH_ASGARDEO_CLIENT_ID=your_asgardeo_client_id
+
+VITE_OAUTH_CLERK_DOMAIN=your-org.clerk.dev
+VITE_OAUTH_CLERK_CLIENT_ID=your_clerk_client_id
+
+VITE_OAUTH_WORKOS_DOMAIN=api.workos.com
+VITE_OAUTH_WORKOS_CLIENT_ID=your_workos_client_id
 ```
 
-Auth0 and Asgardeo API endpoints are constructed from their respective domain/org variables at runtime. Google and Facebook endpoints are already configured in `.env`.
+Auth0, Asgardeo, Clerk, and WorkOS endpoints are constructed from their respective domain/org variables at runtime. Google and Facebook endpoints are already configured in `.env`.
 
-### 6. Install and Run
+### 8. Install and Run
 
 ```bash
 npm install
@@ -104,6 +135,8 @@ The app detects `code=` in the URL, reads the provider from the `state` paramete
 | Google | POST | `application/json` |
 | Facebook | GET | query parameters |
 | Asgardeo | POST | `application/x-www-form-urlencoded` |
+| Clerk | POST | `application/x-www-form-urlencoded` |
+| WorkOS | POST | `application/x-www-form-urlencoded` |
 
 ### Step 3: Logout
 
@@ -113,3 +146,5 @@ The app detects `code=` in the URL, reads the provider from the `state` paramete
 | Google | POST to `/revoke` token endpoint, then redirect home |
 | Facebook | Redirect home (no server-side revocation endpoint) |
 | Asgardeo | Redirect to `/oidc/logout` with `post_logout_redirect_uri` |
+| Clerk | Revoke token via `/oauth/revoke`, then redirect home |
+| WorkOS | Redirect home (no server-side revocation endpoint) |

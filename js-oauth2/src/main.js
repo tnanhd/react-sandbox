@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       <button id="login-facebook">Login Facebook</button>
       <button id="login-asgardeo">Login Asgardeo</button>
       <button id="login-clerk">Login Clerk</button>
+      <button id="login-workos">Login WorkOS</button>
     `;
     document
       .querySelector("#login-auth0")
@@ -30,6 +31,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document
       .querySelector("#login-clerk")
       .addEventListener("click", () => authorize("clerk"));
+    document
+      .querySelector("#login-workos")
+      .addEventListener("click", () => authorize("workos"));
     return;
   }
 
@@ -61,7 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const userInfo = await getUserInfo(provider);
     app.innerHTML = `
         <h1>User Info</h1>
-        ${userInfo.picture ? `<img src="${userInfo.picture}" alt="User Picture" width="100" />` : ''}
+        ${userInfo.picture ? `<img src="${userInfo.picture}" alt="User Picture" width="100" />` : ""}
         <pre>${JSON.stringify(userInfo, null, 2)}</pre>
         <button id="logout">Logout</button>
       `;

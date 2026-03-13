@@ -18,7 +18,7 @@ export const getAccessToken = async (code, provider) => {
       });
 
       return await response.json();
-    } else if (provider === "asgardeo" || provider === "clerk") {
+    } else if (provider === "asgardeo" || provider === "clerk" || provider === "workos") {
       response = await fetch(tokenUrl, {
         method: "POST",
         headers: {
@@ -74,8 +74,11 @@ function getConfig(provider) {
   } else if (provider === "clerk") {
     tokenUrl = `https://${import.meta.env.VITE_OAUTH_CLERK_DOMAIN}/oauth/token`;
     clientId = import.meta.env.VITE_OAUTH_CLERK_CLIENT_ID;
+  } else if (provider === "workos") {
+    tokenUrl = `https://${import.meta.env.VITE_OAUTH_WORKOS_DOMAIN}/oauth2/token`;
+    clientId = import.meta.env.VITE_OAUTH_WORKOS_CLIENT_ID;
   } else {
-    throw new Error("Unsupported provider");
+    throw new Error("Unsupported provider: " + provider);
   }
 
   return { tokenUrl, clientId };

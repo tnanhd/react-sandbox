@@ -22,6 +22,10 @@ export const authorize = async (provider) => {
     params.append("scope", "openid profile email");
   }
 
+  if (provider === "auth0") {
+    params.append("audience", import.meta.env.VITE_OAUTH_AUTH0_AUDIENCE);
+  }
+
   const authEndpoint = `${authUrl}?${params.toString()}`;
   console.log("Redirecting to auth endpoint:", authEndpoint);
   window.location.href = authEndpoint;
@@ -46,8 +50,11 @@ function _getConfig(provider) {
   } else if (provider === "clerk") {
     authUrl = `https://${import.meta.env.VITE_OAUTH_CLERK_DOMAIN}/oauth/authorize`;
     clientId = import.meta.env.VITE_OAUTH_CLERK_CLIENT_ID;
+  } else if (provider === "workos") {
+    authUrl = `https://${import.meta.env.VITE_OAUTH_WORKOS_DOMAIN}/oauth2/authorize`;
+    clientId = import.meta.env.VITE_OAUTH_WORKOS_CLIENT_ID;
   } else {
-    throw new Error(`Unsupported provider: ${provider}`);
+    throw new Error("Unsupported provider: " + provider);
   }
 
   return { authUrl, clientId };

@@ -16,8 +16,10 @@ export const getUserInfo = async (provider) => {
     userInfoEndpoint = `https://api.asgardeo.io/t/${import.meta.env.VITE_OAUTH_ASGARDEO_PROJECT_ID}/oauth2/userinfo`;
   } else if (provider === "clerk") {
     userInfoEndpoint = `https://${import.meta.env.VITE_OAUTH_CLERK_DOMAIN}/oauth/userinfo`;
+  } else if (provider === "workos") {
+    userInfoEndpoint = `https://${import.meta.env.VITE_OAUTH_WORKOS_DOMAIN}/oauth2/userinfo`;
   } else {
-    throw new Error("Unsupported provider");
+    throw new Error("Unsupported provider: " + provider);
   }
 
   const response = await fetch(userInfoEndpoint, {
