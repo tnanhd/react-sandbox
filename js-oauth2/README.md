@@ -17,6 +17,7 @@ A vanilla JavaScript app demonstrating OAuth2 + PKCE with Auth0, Google, Faceboo
 6. Copy the **Domain** (e.g. `dev-xxxx.us.auth0.com`) and **Client ID** from the app settings page
 
 > All Auth0 endpoints are derived from the domain:
+>
 > - Authorization: `https://<domain>/oauth/authorize`
 > - Token: `https://<domain>/oauth/token`
 > - Logout: `https://<domain>/v2/logout`
@@ -56,6 +57,7 @@ A vanilla JavaScript app demonstrating OAuth2 + PKCE with Auth0, Google, Faceboo
 7. Copy your **Organization name** (shown in the URL as `https://api.asgardeo.io/t/<organization-name>/`)
 
 > All Asgardeo endpoints are derived from the organization name:
+>
 > - Authorization: `https://api.asgardeo.io/t/<org>/oauth2/authorize`
 > - Token: `https://api.asgardeo.io/t/<org>/oauth2/token`
 > - Logout: `https://api.asgardeo.io/t/<org>/oidc/logout`
@@ -69,6 +71,7 @@ A vanilla JavaScript app demonstrating OAuth2 + PKCE with Auth0, Google, Faceboo
 4. Copy the **Domain** (e.g. `your-org.clerk.dev`) and **Client ID**
 
 > Clerk endpoints are derived from the domain:
+>
 > - Authorization: `https://<domain>/oauth/authorize`
 > - Token: `https://<domain>/oauth/token`
 > - User Info: `https://<domain>/oauth/userinfo`
@@ -82,6 +85,7 @@ A vanilla JavaScript app demonstrating OAuth2 + PKCE with Auth0, Google, Faceboo
 5. Go to Session and configure Cross-Origin Resource Sharing (CORS)
 
 > WorkOS endpoints are derived from the domain:
+>
 > - Authorization: `https://<domain>/oauth2/authorize`
 > - Token: `https://<domain>/oauth2/token`
 > - User Info: `https://<domain>/oauth2/userinfo`
@@ -125,26 +129,46 @@ The app will be available at `http://localhost:5173`.
 
 When the user clicks a **Login** button, the app generates a PKCE code verifier/challenge pair and redirects to the provider's authorization endpoint with: `response_type=code`, `client_id`, `redirect_uri`, `scope`, `code_challenge`, and `state` (used to identify the provider on return). The provider handles authentication and redirects back to `http://localhost:5173` with a short-lived `code` in the URL.
 
+#### Debugging with curl (Auth0)
+
+```bash
+curl -v "https://<domain>/oauth/authorize?response_type=code&client_id=<client_id>&redirect_uri=http://localhost:5173&scope=openid%20profile%20email&code_challenge=<code_challenge>&code_challenge_method=S256&state=<state>"
+```
+
 ### Step 2: Token Exchange (Code for Access Token)
 
 The app detects `code=` in the URL, reads the provider from the `state` parameter, then exchanges the code for an access token by calling the provider's token endpoint with the `code_verifier`. Each provider uses a slightly different format:
 
-| Provider | Method | Format |
-|----------|--------|--------|
-| Auth0 | POST | `application/json` |
-| Google | POST | `application/json` |
-| Facebook | GET | query parameters |
-| Asgardeo | POST | `application/x-www-form-urlencoded` |
-| Clerk | POST | `application/x-www-form-urlencoded` |
-| WorkOS | POST | `application/x-www-form-urlencoded` |
+#### Token exchange example (Auth0)
+
+```bash
+curl -X POST "https://<domain>/oauth/token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "grant_type":"authorization_code",
+    "client_id":"<client_id>",
+    "code":"<code>",
+    "redirect_uri":"http://localhost:5173",
+    "code_verifier":"<code_verifier>"
+  }'
+```
+
+| Provider | Method | Format                              |
+| -------- | ------ | ----------------------------------- |
+| Auth0    | POST   | `application/json`                  |
+| Google   | POST   | `application/json`                  |
+| Facebook | GET    | query parameters                    |
+| Asgardeo | POST   | `application/x-www-form-urlencoded` |
+| Clerk    | POST   | `application/x-www-form-urlencoded` |
+| WorkOS   | POST   | `application/x-www-form-urlencoded` |
 
 ### Step 3: Logout
 
-| Provider | Logout mechanism |
-|----------|-----------------|
-| Auth0 | Redirect to `/v2/logout` with `returnTo` |
-| Google | POST to `/revoke` token endpoint, then redirect home |
-| Facebook | Redirect home (no server-side revocation endpoint) |
+| Provider | Logout mechanism                                           |
+| -------- | ---------------------------------------------------------- |
+| Auth0    | Redirect to `/v2/logout` with `returnTo`                   |
+| Google   | POST to `/revoke` token endpoint, then redirect home       |
+| Facebook | Redirect home (no server-side revocation endpoint)         |
 | Asgardeo | Redirect to `/oidc/logout` with `post_logout_redirect_uri` |
-| Clerk | Revoke token via `/oauth/revoke`, then redirect home |
-| WorkOS | Redirect home (no server-side revocation endpoint) |
+| Clerk    | Revoke token via `/oauth/revoke`, then redirect home       |
+| WorkOS   | Redirect home (no server-side revocation endpoint)         |
